@@ -1,7 +1,7 @@
 // Setup initial game stats
 var score = 0;
 var lives = 2;
-
+var powerPellets = 4;
 
 // Define your ghosts here
 var inky = {
@@ -38,8 +38,6 @@ var clyde = {
 
 var ghosts = [inky, blinky, pinky, clyde];
 
-// replace this comment with your four ghosts setup as objects
-
 
 // Draw the screen functionality
 function drawScreen() {
@@ -56,16 +54,19 @@ function clearScreen() {
 }
 
 function displayStats() {
-  console.log('Score: ' + score + '     Lives: ' + lives);
+  console.log('Score: ' + score + '     Lives: ' + lives + '\n\n\nPower-Pellets: ' + powerPellets);
 }
 
 function displayMenu() {
-  console.log('\n\nSelect Option:\n');  // each \n creates a new line
-  console.log('(q) Quit');
+  console.log('\n\nSelect Option:\n\n');  // each \n creates a new line
+  console.log('(d) Eat Dot');
+  if (powerPellets > 0) {
+    console.log('(p) Eat Power-Pellet');
+  }
   for (var i = 0; i < ghosts.length; i++) {
     console.log('(' + (i + 1) + ') Eat ' + ghosts[i].name);
   }
-  console.log('(d) Eat Dot');
+  console.log('(q) Quit');
 }
 
 function displayPrompt() {
@@ -80,12 +81,27 @@ function eatDot() {
   score += 10;
 }
 
+function eatPowerPellet() {
+  for (var i = 0; i < ghosts.length; i++) {
+    ghosts[i].edible = true;
+  }
+  score += 50;
+  powerPellets--;
+}
+
 function eatGhost(ghost) {
   if (ghost && !ghost.edible) {
     lives--;
     console.log(" " + ghost.name + " the " + ghost.colour + " killed Pac-Man!")
+    checkLives();
   } else {
     ghosts = ghosts.filter(filtered_ghost => filtered_ghost !== ghost)
+  }
+}
+
+function checkLives() {
+  if (lives < 0) {
+    process.exit();
   }
 }
 
@@ -112,6 +128,14 @@ function processInput(key) {
     case '4':
       eatGhost(ghosts[3]);
       break;
+    case 'p':
+      if (powerPellets > 0) {
+        eatPowerPellet();
+        break;
+      } else {
+        console.log(' No more Power-Pellets left!')
+        break;
+      }
     default:
       console.log('\nInvalid Command!');
   }
